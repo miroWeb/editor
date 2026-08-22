@@ -1,0 +1,32 @@
+{
+  "kanal1": {
+    "button_name": "— XIT KAVKAZ ོ🌪️",
+    "artist": "@𝚇𝙸𝚃_𝙺𝙰𝚅𝙺𝙰𝚉 ✯",
+    "photo": "photos/xitkavkaz.jpg"
+  },
+  "kanal2": {
+    "button_name": "— MUZIKA | CITY 🇺🇸",
+    "artist": "• MUZIKA CITY •",
+    "photo": "photos/city.jpg"
+  },
+  "kanal3": {
+    "button_name": "— MOD | MUZ 🎧",
+    "artist": "T.me/Mod_Muz",
+    "photo": "photos/modmuz.jpg"
+  },
+  "kanal4": {
+    "button_name": "𝗗 𝗡 𝗥 𝗦 𝗡 🦋",
+    "artist": "𝗗 𝗡 𝗥 𝗦 𝗡",
+    "photo": "photos/dnrsn.jpg"
+  },
+  "kanal5": {
+    "button_name": "Muzikalar 2026 ❤️🎶",
+    "artist": "@Xituz_Muzikalar",
+    "photo": "photos/xituz.jpg"
+  },
+  "kanal6": {
+    "button_name": "Muzikalar 2026 👑",
+    "artist": "@Yangi_Muzikalar",
+    "photo": "photos/yangimuz.jpg"
+  }
+}
