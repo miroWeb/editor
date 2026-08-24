@@ -11,9 +11,10 @@ from mutagen.id3 import ID3, TPE1, APIC, ID3NoHeaderError
 logging.basicConfig(level=logging.INFO)
 
 # ============================================================
-# 1) BU YERGA BOTFATHER BERGAN TOKENNI YOZING
+# 1) TOKEN: agar server (Railway) BOT_TOKEN environment variable
+#    orqali bersa o'shani oladi, aks holda pastdagi qatordan oladi
 # ============================================================
-BOT_TOKEN = "8874018629:AAFZs1wFtnVAb7hIdHi80eMZufptvsA0RHw"
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "8874018629:AAFZs1wFtnVAb7hIdHi80eMZufptvsA0RHw")
 
 # channels.json faylidan 6 ta kanal ma'lumotini o'qiydi
 with open("channels.json", "r", encoding="utf-8") as f:
@@ -98,7 +99,18 @@ async def channel_chosen(callback: CallbackQuery):
     audio.save(local_path, v2_version=3)
 
     result_file = FSInputFile(local_path)
-    await callback.message.answer_audio(result_file)
+
+    # Rasmni ID3 tegga yozish bilan bir qatorda, Telegramga "thumbnail"
+    # sifatida ham alohida yuboramiz - shunda rasm doim ko'rinadi
+    thumb_file = None
+    if photo_path and os.path.exists(photo_path):
+        thumb_file = FSInputFile(photo_path)
+
+    await callback.message.answer_audio(
+        result_file,
+        performer=channel["artist"],
+        thumbnail=thumb_file,
+    )
     await callback.answer("Tayyor! ✅")
 
     os.remove(local_path)
