@@ -178,6 +178,7 @@ def main_menu_keyboard():
         inline_keyboard=[
             [InlineKeyboardButton(text="➕ Kanal qo'shish", callback_data="add_channel")],
             [InlineKeyboardButton(text="📋 Kanallarim", callback_data="list_channels")],
+            [InlineKeyboardButton(text="💰 Mening hisobim", callback_data="my_account")],
         ]
     )
 
@@ -336,21 +337,41 @@ async def confirm_payment(message: Message):
         logging.exception("Foydalanuvchiga xabar yuborib bo'lmadi")
 
 
-@dp.message(Command("status"))
-async def status_handler(message: Message):
-    user_id = message.from_user.id
+def build_status_text(user_id: int) -> str:
     _, record = get_user_record(user_id)
 
     if is_subscribed(user_id):
         until = datetime.fromisoformat(record["subscribed_until"])
-        await message.answer(f"✅ Obunangiz faol, {until.strftime('%Y-%m-%d')} gacha.")
+        return f"✅ Obunangiz faol, {until.strftime('%Y-%m-%d')} gacha."
+
+    used = record.get("free_used", 0)
+    qolgan = max(FREE_LIMIT - used, 0)
+    return (
+        f"Bepul limit: {used}/{FREE_LIMIT} ishlatilgan, {qolgan} ta qoldi.\n"
+        f"Obuna: yo'q. {SUBSCRIPTION_PRICE_TEXT} / {SUBSCRIPTION_DAYS} kun uchun quyidagi\n"
+        f"tugmalardan birini bosing:"
+    )
+
+
+@dp.message(Command("status"))
+async def status_handler(message: Message):
+    user_id = message.from_user.id
+    text = build_status_text(user_id)
+    if is_subscribed(user_id):
+        await message.answer(text)
     else:
-        used = record.get("free_used", 0)
-        qolgan = max(FREE_LIMIT - used, 0)
-        await message.answer(
-            f"Bepul limit: {used}/{FREE_LIMIT} ishlatilgan, {qolgan} ta qoldi.\n"
-            f"Obuna: yo'q. {SUBSCRIPTION_PRICE_TEXT} / {SUBSCRIPTION_DAYS} kun uchun /start bosing."
-        )
+        await message.answer(text, reply_markup=subscribe_keyboard())
+
+
+@dp.callback_query(F.data == "my_account")
+async def my_account(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    text = build_status_text(user_id)
+    if is_subscribed(user_id):
+        await callback.message.answer(text)
+    else:
+        await callback.message.answer(text, reply_markup=subscribe_keyboard())
+    await callback.answer()
 
 
 @dp.message(Command("stats"))
