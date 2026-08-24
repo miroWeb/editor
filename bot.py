@@ -131,10 +131,10 @@ def has_access(user_id: int) -> bool:
 
 
 def register_free_use(user_id: int):
-    if is_subscribed(user_id):
-        return  # obuna faol bo'lsa, bepul limitni sarflamaymiz
     data, record = get_user_record(user_id)
-    record["free_used"] = record.get("free_used", 0) + 1
+    record["total_used"] = record.get("total_used", 0) + 1
+    if not is_subscribed(user_id):
+        record["free_used"] = record.get("free_used", 0) + 1
     data[str(user_id)] = record
     save_users(data)
 
@@ -185,6 +185,14 @@ def main_menu_keyboard():
 @dp.message(Command("start"))
 async def start_handler(message: Message, state: FSMContext):
     await state.clear()
+
+    data, record = get_user_record(message.from_user.id)
+    if "started_at" not in record:
+        record["started_at"] = datetime.now().isoformat()
+    record["username"] = message.from_user.username
+    data[str(message.from_user.id)] = record
+    save_users(data)
+
     await message.answer(
         "Salom! Bu bot musiqa fayllarga siz belgilagan kanal nomi va rasmini avtomatik qo'yib beradi.\n\n"
         "Avval kamida bitta kanal qo'shing, keyin menga musiqa yuboraverasiz.",
@@ -343,6 +351,29 @@ async def status_handler(message: Message):
             f"Bepul limit: {used}/{FREE_LIMIT} ishlatilgan, {qolgan} ta qoldi.\n"
             f"Obuna: yo'q. {SUBSCRIPTION_PRICE_TEXT} / {SUBSCRIPTION_DAYS} kun uchun /start bosing."
         )
+
+
+@dp.message(Command("stats"))
+async def stats_handler(message: Message):
+    if message.from_user.id != ADMIN_ID:
+        return  # faqat admin ko'ra oladi
+
+    data = load_users()
+
+    total_started = sum(1 for r in data.values() if r.get("started_at"))
+    total_with_channels = sum(1 for r in data.values() if r.get("channels"))
+    total_channels = sum(len(r.get("channels", {})) for r in data.values())
+    total_edits = sum(r.get("total_used", 0) for r in data.values())
+    total_subscribed = sum(1 for uid in data if is_subscribed(int(uid)))
+
+    await message.answer(
+        "📊 Bot statistikasi\n\n"
+        f"👤 /start bosganlar: {total_started}\n"
+        f"📻 Kanal qo'shganlar: {total_with_channels}\n"
+        f"📁 Jami kanallar soni: {total_channels}\n"
+        f"🎵 Jami tayyorlangan mp3'lar: {total_edits}\n"
+        f"💳 Hozir obunasi faol: {total_subscribed}"
+    )
 
 
 # ------------------------------------------------------------
