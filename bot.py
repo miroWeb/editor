@@ -36,7 +36,7 @@ SUBSCRIPTION_PRICE_TEXT = "39 000 so'm"
 CARD_NUMBER = os.environ.get("CARD_NUMBER", "5614 6865 0476 3734 (XAKIMOV MIRODIL)")
 
 # Admin username (@siz) - Railway'da ADMIN_USERNAME orqali bering (@ belgisisiz)
-ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "@miro_lv")
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "miro_lv")
 
 # Adminning Telegram user ID raqami - /confirm buyrug'ini faqat shu odam ishlata oladi
 # Railway'da ADMIN_ID environment variable orqali bering
